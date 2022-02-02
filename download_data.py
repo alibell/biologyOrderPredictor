@@ -25,7 +25,15 @@ folder = "./data"
 for file_name, file_metadata in file_path.items():
     destination = "/".join([folder, file_name])
     
-    if os.path.isfile(destination) == False or os.path.getsize(destination) != file_metadata[1]:
+    download_file = True
+
+    if os.path.exists(destination) and (os.path.getsize(destination) != file_metadata[1]):
+        download_file = False
+    
+    if os.path.exists("./data") == False:
+        os.mkdir("./data")
+
+    if download_file:
         uri = f"{file_metadata[0]}/{token}"
         r = requests.get(uri, stream=True)
         file_size = int(int(r.headers.get('content-length'))/1000)
