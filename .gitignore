@@ -63,3 +63,5 @@ data/
 workflow/
 wd/
 wd/*
+*/*for_batch*
+*.xml
