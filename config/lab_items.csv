@@ -14,7 +14,7 @@ item_id,label,fluid,count,1,2,3
 50902,Chloride,Blood,201818,Chlorure,Iono,IonoC
 50971,Potassium,Blood,201789,Potassium,Iono,IonoC
 50882,Bicarbonate,Blood,201761,Bicarbonates,Bicarbonates,Gazometrie
-50931,Glucose,Blood,201605,Glycemie_Sanguine,Glycemie_Sanguine,Glycemie_Sanguine
+50931,Glucose,Blood,201605,,,
 50868,Anion Gap,Blood,201523,,,
 51254,Monocytes,Blood,201247,Monocytes,NFS,NFS
 51256,Neutrophils,Blood,201247,Neutrophiles,NFS,NFS
@@ -22,15 +22,15 @@ item_id,label,fluid,count,1,2,3
 51200,Eosinophils,Blood,201247,Eosinophiles,NFS,NFS
 51146,Basophils,Blood,201247,Basophiles,NFS,NFS
 50920,Estimated GFR (MDRD equation),Blood,185745,,,
-51487,Nitrite,Urine,122408,BU,BU,BU
+51487,Nitrite,Urine,122408,,,
 51464,Bilirubin,Urine,122408,,,
-51492,Protein,Urine,122408,BU,BU,BU
-51466,Blood,Urine,122408,BU,BU,BU
-51486,Leukocytes,Urine,122408,BU,BU,BU
-51491,pH,Urine,122408,BU,BU,BU
-51478,Glucose,Urine,122408,BU,BU,BU
+51492,Protein,Urine,122408,,,
+51466,Blood,Urine,122408,,,
+51486,Leukocytes,Urine,122408,,,
+51491,pH,Urine,122408,,,
+51478,Glucose,Urine,122408,,,
 51498,Specific Gravity,Urine,122408,,,
-51484,Ketone,Urine,122408,BU,BU,BU
+51484,Ketone,Urine,122408,,,
 51514,Urobilinogen,Urine,122408,,,
 51506,Urine Appearance,Urine,122408,,,
 50933,Green Top Hold (plasma),Blood,116812,,,
@@ -60,10 +60,10 @@ item_id,label,fluid,count,1,2,3
 50878,Asparate Aminotransferase (AST),Blood,85780,ASAT,Hepatique,Hepato-Biliaire
 50861,Alanine Aminotransferase (ALT),Blood,85732,ALAT,Hepatique,Hepato-Biliaire
 50863,Alkaline Phosphatase,Blood,85509,PAL,Biliaire,Hepato-Biliaire
-50862,Albumin,Blood,80302,Albumine,Albumine,Albumine
+50862,Albumin,Blood,80302,,,
 50960,Magnesium,Blood,73255,,,
-50893,"Calcium, Total",Blood,72831,Calcemie,Calcemie,Calcemie
-50970,Phosphate,Blood,72039,,,
+50893,"Calcium, Total",Blood,72831,Calcemie,Phospho-Calcique,Phospho-Calcique
+50970,Phosphate,Blood,72039,Phosphate,Phospho-Calcique,Phospho-Calcique
 51512,Urine Mucous,Urine,69165,,,
 51103,Uhold,Urine,68430,,,
 51003,Troponin T,Blood,67902,Troponine,Troponine,Cardiaque
@@ -91,7 +91,7 @@ item_id,label,fluid,count,1,2,3
 50802,Base Excess,Blood,20193,Gazometrie,Gazometrie,Gazometrie
 50818,pCO2,Blood,20185,Gazometrie,Gazometrie,Gazometrie
 50821,pO2,Blood,20183,Gazometrie,Gazometrie,Gazometrie
-50910,Creatine Kinase (CK),Blood,19894,CPK,CPK,CPK
+50910,Creatine Kinase (CK),Blood,19894,,,
 51734,STX3,Blood,19891,,,
 51732,STX1,Blood,19764,,,
 51737,STX6,Blood,19690,,,
@@ -128,7 +128,7 @@ item_id,label,fluid,count,1,2,3
 51736,STX5,Blood,9436,,,
 51735,STX4,Blood,9433,,,
 50803,"Calculated Bicarbonate, Whole Blood",Blood,8797,,,
-50889,C-Reactive Protein,Blood,8424,CRP,CRP,CRP
+50889,C-Reactive Protein,Blood,8424,,,
 51873,Influenza B by PCR,Other Body Fluid,7943,,,
 51865,Influenza A by PCR,Other Body Fluid,7943,,,
 51260,Ovalocytes,Blood,7294,,,
@@ -137,7 +137,7 @@ item_id,label,fluid,count,1,2,3
 51214,"Fibrinogen, Functional",Blood,6557,,,
 50810,"Hematocrit, Calculated",Blood,6529,Ht,NFS,NFS
 50811,Hemoglobin,Blood,6529,Hb,NFS,NFS
-50915,D-Dimer,Blood,6434,D-Dimeres,D-Dimeres,D-Dimeres
+50915,D-Dimer,Blood,6434,,,
 50812,Intubated,Blood,6126,,,
 51100,"Sodium, Urine",Urine,5202,,,
 51082,"Creatinine, Urine",Urine,5185,,,
