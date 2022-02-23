@@ -1,9 +1,32 @@
 """
-    This script the preprocessing functions
+    This script contains the preprocessing functions
 """
 
 import sqlite3
 import pandas as pd
+
+def get_Xy_df (X, y):
+    """
+        Merge together the X and y dataframe on stay_id basis
+
+        Parameters
+        ----------
+        X: pandas dataframe of features
+        y: pandas dataframe of labeles
+
+        Output
+        ------
+        Xy : merged pandas dataframe
+    """
+
+    Xy = pd.merge(
+        X,
+        y,
+        left_on="stay_id",
+        right_on="stay_id"
+    )
+
+    return Xy
 
 def generate_features_dataset(database, get_drugs=True, get_diseases=True):
 
@@ -186,3 +209,35 @@ def generate_labels_dataset(database, lab_dictionnary):
     labels = labs_deduplicate_pivot_final.sort_values("stay_id").reset_index(drop=True)
 
     return labels
+
+def remove_outliers (X, variables_ranges):
+    """
+        This function remove the outliers and replace them by an NA according to the variable_ranges rules
+
+        Parameters
+        ----------
+        X: pandas Dataframe
+        variables_ranges: Dict(variable:[range_inf, range_sup], ...), dictionnary containing for each variable the inferior and superior range
+
+        Outputs
+        -------
+        Tuple containing :
+        - Processing dataframe
+        - A Dataframe containing the number and percentage of processed outliers per variable
+    """
+
+    outliers = {}
+    X_copy = X.copy()
+
+    for key, value in variables_ranges.items():
+        outliers_mask = ((X[key] < value[0]) | (X[key] > value[1]))
+        outliers[key] = outliers_mask.sum() # Storing the number of outliers
+        X_copy.loc[outliers_mask, key] = pd.NA # Setting outliers to NA
+
+    outlier_report = pd.DataFrame.from_dict(outliers, orient="index") \
+        .rename(columns={0:"n"}) \
+        .assign(total=X[outliers.keys()].count().values,
+                pourcentage=lambda x: (x["n"]/x["total"])*100
+        )
+
+    return X_copy, outlier_report
