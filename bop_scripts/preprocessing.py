@@ -4,6 +4,7 @@
 
 import sqlite3
 import pandas as pd
+import numpy as np
 
 def get_Xy_df (X, y):
     """
@@ -232,7 +233,7 @@ def remove_outliers (X, variables_ranges):
     for key, value in variables_ranges.items():
         outliers_mask = ((X[key] < value[0]) | (X[key] > value[1]))
         outliers[key] = outliers_mask.sum() # Storing the number of outliers
-        X_copy.loc[outliers_mask, key] = pd.NA # Setting outliers to NA
+        X_copy.loc[outliers_mask, key] = np.NaN # Setting outliers to NA
 
     outlier_report = pd.DataFrame.from_dict(outliers, orient="index") \
         .rename(columns={0:"n"}) \
