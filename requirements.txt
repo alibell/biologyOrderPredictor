@@ -1,4 +1,7 @@
 progress
-pyarrow
 pandas
-sqlite3
+numpy
+seaborn
+fasttext
+wordcloud
+sklearn
