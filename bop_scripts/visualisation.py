@@ -345,7 +345,7 @@ def display_model_performances(classifier, X_test, y_test, algorithm_name="", th
     fig = plt.figure(constrained_layout=True, figsize=(15*ncols,7*nrows))
     figs = fig.subfigures(nrows, ncols)
     figs = figs.flatten()
-    if len(labels) == 1:
+    if (ncols+nrows) == 1:
         figs = [figs]
     axs = [x.subplots(1, 2) for x in figs]
 
