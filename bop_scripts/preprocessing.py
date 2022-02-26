@@ -164,7 +164,9 @@ def generate_labels_dataset(database, lab_dictionnary):
     lab_dictionnary_list = [str(x) for x in lab_dictionnary.keys()]
 
     ## Let's create an index to speed up queries
-    conn.execute("CREATE INDEX IF NOT EXISTS biological_index ON labevents (stay_id, itemid)")
+    curs = conn.cursor()
+    curs.execute("CREATE INDEX IF NOT EXISTS biological_index ON labevents (stay_id, itemid)")
+    curs.close()
 
     # 1. Generating features
 
