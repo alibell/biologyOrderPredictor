@@ -1,7 +1,9 @@
 from matplotlib import pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import roc_curve, roc_auc_score, precision_score, recall_score, accuracy_score, ConfusionMatrixDisplay, f1_score, confusion_matrix
 from wordcloud import WordCloud
 import seaborn as sns
+import itertools
 import pandas as pd
 import numpy as np
 import random
@@ -262,3 +264,128 @@ def plot_odd_word_wc(X, y, text_column, labels, min_occurrence=3, ncols=5):
 
     fig.suptitle("WordCloud selon le label")
     plt.show()
+
+def vizualize_features_selection (scores, score_name, f_precision=2, n_score_max=5, ncols=3):
+    """
+        This function produce an heatmap of metrics score according to each variables combination
+
+        Parameters
+        ----------
+        scores: Dictionnary containing a list of combination and associated score for each label produced by the .models.get_features_selection function
+        score_name: str, Name of the score
+        f_precision: int, floating point precision is the number of decimal to keep
+        n_score_max: int, maximum number of scores to display
+        ncols: int, number of columns in the output plot
+    """
+
+    # Creating a dataframe containing the scores
+    scores_df = []
+    for key, value in scores.items():
+        scores_df_temp = pd.DataFrame(
+            [dict(zip(x[0], [x[1] for i in range(len(x[0]))])) for x in value]
+        ).assign(score=lambda x: x.max(axis=1))
+        scores_df_temp.iloc[:,:-1] = (scores_df_temp.iloc[:,:-1].fillna("")*0).astype("str").replace("0.0", "x")
+        scores_df_temp["name"] = key
+        scores_df.append(scores_df_temp.sort_values("score", ascending=False))
+
+    scores_df = pd.concat(scores_df).reset_index(drop=True)
+    scores_df["n_features"] = (scores_df == "x").sum(axis=1)
+    scores_df[score_name] = scores_df["score"].round(f_precision)
+    scores_df = scores_df.sort_values(["name", "roc_auc", score_name], ascending=[True, False, True]).drop_duplicates(["name", score_name])
+
+    # Plotting the dataframe
+    scores_list = scores_df["name"].drop_duplicates().values.tolist()
+    ncols = 3
+    nrows = len(scores_list)//ncols + (len(scores_list)%ncols != 0)*1
+
+    fig, axs = plt.subplots(nrows, ncols, figsize=(5*ncols,4*nrows))
+    axs = axs.flatten()
+
+    for i in range(len(scores_list)):
+        score = scores_list[i]
+        sns.heatmap(
+            (scores_df.query(f"name == '{score}'").set_index("roc_auc").head(n_score_max).iloc[:, :-3] == 'x')*1,
+            ax=axs[i]
+        )
+        axs[i].set_title(score)
+
+    fig.suptitle(f"{score_name} according to features included in the model")
+    plt.tight_layout()
+
+def display_model_performances(classifier, X_test, y_test, algorithm_name="", threshold=0.5, ncols=1):
+    """
+        This function produce a vizualization of the model performances
+
+        Parameters
+        ----------
+        classifier: python object which should contains a predict and a predict_proba method, if many labels a dict in the format {label:classifier,...} is expected
+        X_test: pandas dataframe of the features
+        y_test: pandas dataframe of the labels
+        algorithm_name: str, name of the algorithm
+        threshold: float, threshold for classification
+        ncols: int, number of columns
+    """
+
+    # Checking type of y_test
+    if isinstance(y_test, pd.Series):
+        y_test = pd.DataFrame(y_test)
+
+    # Checking if one or many labels
+    if len(y_test.shape) > 1 and y_test.shape[1] > 1:
+        if isinstance(classifier, dict) == False or len(classifier.keys()) != y_test.shape[1]:
+            raise ValueError("You should provide as many classifier than labels")
+    else:
+        if isinstance(classifier, dict) == False:
+            classifier = {y_test.columns[0]:classifier}
+
+    labels = y_test.columns.tolist()
+
+    # Construction of the pyplot object
+    nrows = (len(labels)//ncols) + ((len(labels)%ncols)!=0)*1
+    fig = plt.figure(constrained_layout=True, figsize=(15*ncols,7*nrows))
+    figs = fig.subfigures(nrows, ncols)
+    figs = figs.flatten()
+    if len(labels) == 1:
+        figs = [figs]
+    axs = [x.subplots(1, 2) for x in figs]
+
+    # For each label :
+    for i in range(len(labels)):
+        label = labels[i]
+        label_classifier = classifier[label]
+        figs[i].suptitle(label)
+
+        y_test_true = y_test[label].values
+        y_test_hat_proba = label_classifier.predict_proba(X_test)[:,1]
+        y_test_hat = (y_test_hat_proba >= threshold)*1
+
+        # Computation of metrics
+        f1_score_, accuracy_score_, recall_score_, precision_score_ = [x(y_test_true, y_test_hat) for x in [f1_score, accuracy_score, recall_score, precision_score]]
+        auc_score_ = roc_auc_score(y_test_true, y_test_hat_proba)
+        confusion_matrix_ = confusion_matrix(y_test_true, y_test_hat)
+
+        # Plotting
+        ## Confusion matrix
+        ConfusionMatrixDisplay(
+            confusion_matrix_,
+            display_labels=[0, 1]
+        ).plot(
+            ax=axs[i][0]
+        )
+
+        ## ROC curve
+        fpr, tpr, thresholds = roc_curve(
+            y_test_true,
+            y_test_hat_proba
+        )
+
+        axs[i][1].plot(
+            fpr,
+            tpr,
+            label=f"AUC: {auc_score_:.2f}\nF1-Score: {f1_score_:.2f}\nRecall: {recall_score_:.2f}\nPrecision: {precision_score_:.2f}\nAccuracy: {accuracy_score_:.2f}"
+        )
+        axs[i][1].legend(loc=4, fontsize="x-large")
+        axs[i][1].set_ylabel('Taux de vrai positifs')
+        axs[i][1].set_xlabel('Taux de faux positifs')
+
+    fig.suptitle(f"Performance de l'algorithme {algorithm_name} avec un threshold de {threshold}")

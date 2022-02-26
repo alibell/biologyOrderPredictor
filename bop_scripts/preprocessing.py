@@ -5,6 +5,7 @@
 import sqlite3
 import pandas as pd
 import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
 
 def get_Xy_df (X, y):
     """
@@ -144,7 +145,6 @@ def generate_features_dataset(database, get_drugs=True, get_diseases=True):
     
 
 def generate_labels_dataset(database, lab_dictionnary):
-
     """
         Generate features dataset according to the data
 
@@ -242,3 +242,59 @@ def remove_outliers (X, variables_ranges):
         )
 
     return X_copy, outlier_report
+
+class OutlierRemover(BaseEstimator, TransformerMixin):
+    """
+        Sklearn-like class for removing outliers
+        To be included in the pipeline
+    """
+
+    def __init__ (self, variables_ranges):
+        """
+            Parameters:
+            ----------
+            variables_ranges: Dict(variable:[range_inf, range_sup], ...), dictionnary containing for each variable the inferior and superior range
+        """
+
+        super().__init__()
+
+        # Storing ranges rules
+        self.variables_ranges = variables_ranges
+
+    def fit(self, X=None, y=None):
+        return self
+
+    def transform(self, X):
+        X_copy, _ = remove_outliers(X, self.variables_ranges)
+        return X_copy
+
+class TextPreprocessing(BaseEstimator, TransformerMixin):
+    """
+        Sklearn-like class for text preprocessing
+        To be included in the pipeline
+
+        What does it do :
+        - It fills na with empty string
+        - It lower string
+        - It replace comma by space
+    """
+
+    def __init__ (self):
+
+        """
+            Parameters:
+            ----------
+        """
+
+        super().__init__()
+
+    def fit(self, X=None, y=None):
+        return self
+
+    def transform(self, X):
+        colname = X.name
+        X = X \
+            .fillna("") \
+            .replace(",", " ").str.lower()
+
+        return X
