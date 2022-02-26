@@ -214,7 +214,7 @@ class torchMLPClassifier_sklearn (BaseEstimator):
         y_hat_proba_torch = np.concatenate([
             1-y_hat_proba_torch,
             y_hat_proba_torch
-        ], axis=0)
+        ], axis=1)
         y_hat_proba = y_hat_proba_torch
 
         return y_hat_proba
