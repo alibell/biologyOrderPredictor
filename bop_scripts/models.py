@@ -158,16 +158,17 @@ def get_features_selection (X, y, classifier, categorical_variables, continuous_
 
     return scores
 
-def fit_all_classifiers(classifier, X_train, y_train, hide_warnings=True):
+def fit_all_classifiers(classifier_fn, X_train, y_train, hide_warnings=True, verbose=False):
     """
         This function fill all the models for each label.
 
         Parameters:
         ----------
-        model: Classifier with a fit method
+        classifier_fn: Function to raise a new classifier with fit method
         X: Pandas Dataframe of features
         y: Pandas Dataframe of labels
         hide_warnings: boolean, if true the warnings will be hidden
+        verbose: boolean, if true the trained model are printed
 
         Output:
         -------
@@ -180,6 +181,10 @@ def fit_all_classifiers(classifier, X_train, y_train, hide_warnings=True):
     labels = y_train.columns.tolist()
     classifiers = {}
     for label in labels:
+        if verbose:
+            print(f"Training model {label}")
+        
+        classifier = classifier_fn()
         classifiers[label] = classifier.fit(X_train, y_train[label])
 
     return classifiers
