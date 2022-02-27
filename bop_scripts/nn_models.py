@@ -38,7 +38,7 @@ class torchMLPClassifier_sklearn (BaseEstimator):
         Pytorch neural network with a sklearn-like API
     """
 
-    def __init__ (self, model, n_epochs=50, early_stop=True, early_stop_metric="accuracy", early_stop_validations_size=0.1, batch_size=1024, learning_rate=1e-3, class_weight=None, device_train="cpu", device_predict="cpu"):
+    def __init__ (self, model, n_epochs=50, early_stop=True, early_stop_metric="accuracy", early_stop_validations_size=0.1, batch_size=1024, learning_rate=1e-3, class_weight=None, device_train="cpu", device_predict="cpu", verbose=False):
         """
             Parameters:
             -----------
@@ -52,6 +52,7 @@ class torchMLPClassifier_sklearn (BaseEstimator):
             class_weight: dict or str, same as the sklearn API
             device_train: str, device on which to train
             device_predict: str, device on which to predict
+            verbose: boolean, if true the loss and score are printed
         """
 
         self.model = model
@@ -59,6 +60,7 @@ class torchMLPClassifier_sklearn (BaseEstimator):
         self.n_epochs = n_epochs
         if early_stop and (early_stop_metric is not None) and (early_stop_metric in SCORERS.keys()) and (isinstance(early_stop_validations_size, int) or isinstance(early_stop_validations_size, float)):
             self.early_stop = early_stop
+            self.early_stop_metric_name = early_stop_metric
             self.early_stop_metric = SCORERS[early_stop_metric]
             self.early_stop_validations_size = early_stop_validations_size
         else:
@@ -71,6 +73,7 @@ class torchMLPClassifier_sklearn (BaseEstimator):
         self.device_train = device_train
         self.device_predict = device_predict
         self.batch_size = batch_size
+        self.verbose = verbose
 
     def fit(self, X, y):
         """
@@ -103,7 +106,6 @@ class torchMLPClassifier_sklearn (BaseEstimator):
         self.network = self.model(n_features=n_features, n_labels=n_labels)
         self.optimizer = optim.Adam(self.network.parameters(), lr=self.learning_rate)
 
-
         # Creating dataloader for X_train, y_train
         data_loader = DataLoader(range(X_train.shape[0]), shuffle=True, batch_size=self.batch_size)
 
@@ -124,6 +126,8 @@ class torchMLPClassifier_sklearn (BaseEstimator):
         last_score = 0
         for i in range(self.n_epochs):
 
+            self.network = self.network.to(self.device_train)
+
             # Starting an epoch
             for indices in data_loader:
                 self.optimizer.zero_grad()
@@ -141,6 +145,7 @@ class torchMLPClassifier_sklearn (BaseEstimator):
                     criterion.weigths = sample_weights
 
                 # Get prediction
+                X_train_sample_tensor, y_train_sample_tensor = X_train_sample_tensor.to(self.device_train), y_train_sample_tensor.to(self.device_train)
                 y_train_sample_hat = self.network(X_train_sample_tensor)
 
                 loss = criterion(y_train_sample_hat, y_train_sample_tensor)
@@ -156,6 +161,12 @@ class torchMLPClassifier_sklearn (BaseEstimator):
                     return self
                 else:
                     last_score = score
+
+            if self.verbose:
+                if self.early_stop:
+                    print(f"Epoch {i} : Loss {loss.item():.3f} - {self.early_stop_metric_name} {score:.3f}")
+                else:
+                    print(f"Epoch {i} : Loss {loss.item():.3f}")
 
         return self
 
