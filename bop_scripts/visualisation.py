@@ -60,7 +60,7 @@ def plot_missing_outcome(X, y, features, labels, figsize=(20,10)):
             pd.DataFrame(Xy[features].isna().astype("int").sum(axis=1))
         ).rename(columns={0:"n_NA"}) \
         .groupby("n_NA") \
-        .agg(lambda x: x.sum()/x.count())
+        .agg(lambda x: x.sum()/x.count())*100
 
     fig,ax = plt.subplots(1, 1, figsize=figsize)
     sns.lineplot(
@@ -73,6 +73,7 @@ def plot_missing_outcome(X, y, features, labels, figsize=(20,10)):
 
     ax.set_xlabel("Nombre de valeurs manquantes")
     ax.set_ylabel("Pourcentage d'examen prescrit")
+    ax.set_ylim(0,100)
     ax.set_title("% de prescription de bilans en fonction du nombre de variables manquantes")
 
 def plot_missing_bar(X, features, figsize=(15,10)):
@@ -88,7 +89,8 @@ def plot_missing_bar(X, features, figsize=(15,10)):
 
     fig, ax = plt.subplots(1,1, figsize=figsize)
 
-    data = (X[features].isna()*1).mean().reset_index()
+    data = ((X[features].isna()*1).mean()*100).reset_index()
+
     sns.barplot(
         data=data,
         x="index",
@@ -98,6 +100,7 @@ def plot_missing_bar(X, features, figsize=(15,10)):
 
     ax.set_title("% de valeurs manquantes par variable")
     ax.set_xlabel("Variable")
+    ax.set_ylim(0,100)
     ax.set_ylabel("% de valeurs manquantes")
 
 def plot_correlation(X, features, figsize=(10,6)):
