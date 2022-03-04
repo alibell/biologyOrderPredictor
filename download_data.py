@@ -13,7 +13,7 @@ if len(sys.argv) > 1:
 
 file_path = {
     "mimic-iv.sqlite":[
-        "http://chessm2ds.alibellamine.me:5000/",
+        "http://m2ds.alibellamine.me/",
         3214753792
     ]
 }
