@@ -79,7 +79,7 @@ class Classifier(BaseEstimator):
         predictions = []
         y_columns = labels
         for y_column in y_columns:
-            predictions.append(self.classifiers[y_column].predict(X).reshape(-1, 1))
+            predictions.append(self.classifiers[y_column].predict_proba(X).reshape(-1, 1))
         y_pred = np.concatenate(predictions, axis=1)
 
         return y_pred
