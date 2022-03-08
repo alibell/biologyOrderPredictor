@@ -7,3 +7,4 @@ wordcloud
 sklearn
 torch
 scipy
+ramp-workflow
